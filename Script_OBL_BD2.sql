@@ -125,8 +125,6 @@ SELECT * FROM Licencias
 SELECT * FROM TipoViolacion
 SELECT * FROM Inspecciones
 
-
-
 --3. Utilizando SQL implementar las siguientes consultas:
 
 --a. Mostrar nombre, dirección y teléfono de los establecimientos que tuvieron la inspección fallida 
@@ -146,7 +144,6 @@ FROM TipoViolacion tv
 INNER JOIN Inspecciones i on i.violCodigo = tv.violCodigo
 WHERE YEAR(i.inspFecha) = YEAR(GETDATE())
 GROUP BY tv.violCodigo , tv.violDescrip
-
 
 
 --c. Mostrar número y nombre de los establecimientos que cometieron todos los tipos de violación 
@@ -170,12 +167,24 @@ INNER JOIN TipoViolacion tv on i.violCodigo = tv.violCodigo
 --d. Mostrar el porcentaje de inspecciones reprobadas por cada establecimiento, incluir dentro de 
 --la reprobación las categorías 'Falla', 'Pasa con condiciones'.
 
+--// Porcentaje inspecinesFallidas * 100 % establecimientosTotales //
+
+SELECT e.estNombre , COUNT(i.estNumero) AS cantidadEstablecimientosConFallaOCondiciones,COUNT(i.estNumero) * 100.0 / (SELECT COUNT(estNumero) FROM Establecimientos) AS porcentaje 
+FROM Establecimientos e
+INNER JOIN Inspecciones i ON i.estNumero = e.estNumero
+WHERE i.inspResultado = 'Falla' OR i.inspResultado = 'Pasa con condiciones'
+GROUP BY e.estNombre;
+
+
+
+
 
 --e. Mostrar el ranking de inspecciones de establecimientos, dicho ranking debe mostrar número 
 --y nombre del establecimiento, total de inspecciones, total de inspecciones aprobadas 
 --('Pasa'), porcentaje de dichas inspecciones aprobadas, total de inspecciones reprobadas 
 --('Falla', 'Pasa con condiciones') y porcentaje de dichas inspecciones reprobadas, solo 
 --tener en cuenta establecimientos cuyo status de licencia es APR.
+
 
 
 --f. Mostrar la diferencia de días en que cada establecimiento renovó su licencia.
