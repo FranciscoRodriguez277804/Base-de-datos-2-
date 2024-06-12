@@ -1,0 +1,8 @@
+Existe un cambio en lo que se solicita en el ejercicio F de SQL
+===============================================================
+
+Actual
+f. Mostrar el tiempo promedio que tarda cada establecimiento en renovar su licencia.
+
+Debe decir
+f. Mostrar la diferencia de días en que cada establecimiento renovó su licencia.
