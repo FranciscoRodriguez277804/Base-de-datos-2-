@@ -107,6 +107,20 @@ VALUES
 
 INSERT INTO Inspecciones(inspFecha, estNumero, inspRiesgo, inspResultado, violCodigo, inspComents)
 VALUES 
+	('2024-06-13 09:00:00', 12, 'Alto', 'Falla', 1, 'Falta de higiene en el área de cocina'),
+    ('2024-06-13 10:00:00', 12, 'Alto', 'Falla', 2, 'Incumplimiento de normativas de seguridad'),
+    ('2024-06-13 11:00:00', 12, 'Alto', 'Falla', 3, 'Problemas de seguridad detectados'),
+    ('2024-06-13 12:00:00', 12, 'Alto', 'Falla', 4, 'Necesita mantenimiento urgente'),
+    ('2024-06-13 13:00:00', 12, 'Alto', 'Falla', 5, 'Problemas de ventilación detectados'),
+    ('2024-06-13 14:00:00', 12, 'Alto', 'Falla', 6, 'Contaminación del área de preparación de alimentos'),
+    ('2024-06-13 15:00:00', 12, 'Alto', 'Falla', 7, 'Manipulación incorrecta de alimentos'),
+    ('2024-06-13 16:00:00', 12, 'Alto', 'Falla', 8, 'Problemas estructurales en el edificio'),
+    ('2024-06-13 17:00:00', 12, 'Alto', 'Falla', 9, 'Contaminación de alimentos detectada'),
+    ('2024-06-13 18:00:00', 12, 'Alto', 'Falla', 10, 'Ausencia de señalización de emergencia'),
+    ('2024-06-13 19:00:00', 12, 'Alto', 'Falla', 11, 'Ausencia de equipos de emergencia'),
+    ('2024-06-13 20:00:00', 12, 'Alto', 'Falla', 12, 'Presencia de insectos y plagas'),
+    ('2024-06-13 21:00:00', 12, 'Alto', 'Falla', 13, 'Manipulación de alimentos sin guantes'),
+    ('2024-06-13 22:00:00', 12, 'Alto', 'Falla', 14, 'Almacenamiento inadecuado de alimentos'),
     ('2024-06-01 09:00:00', 1, 'Bajo', 'Pasa', 1, 'Cumple con todas las normativas de higiene'),
     ('2024-06-02 10:00:00', 2, 'Medio', 'Falla', 3, 'Problemas de seguridad detectados'),
     ('2024-06-03 11:00:00', 3, 'Alto', 'Pasa con condiciones', 5, 'Problemas de ventilación detectados'),
@@ -119,6 +133,8 @@ VALUES
     ('2024-06-10 12:00:00', 10, 'Medio', 'Falla', 3, 'Falta de equipos de emergencia'),
     ('2024-06-11 13:00:00', 11, 'Bajo', 'Pasa', 5, 'Cumple con las normativas de ventilación'),
     ('2024-06-12 14:00:00', 12, 'Alto', 'Oficina no encontrada', 2, 'No se pudo realizar la inspección');
+
+
 
 SELECT * FROM Establecimientos
 SELECT * FROM Licencias
@@ -153,30 +169,21 @@ SELECT e.estNumero , e.estNombre
 FROM Establecimientos e
 INNER JOIN Inspecciones i on i.estNumero = e.estNumero
 INNER JOIN TipoViolacion tv on tv.violCodigo = i.violCodigo
-WHERE tv.violCodigo = ALL (SELECT DISTINCT i.violCodigo
-							FROM Inspecciones i
-							GROUP BY i.violCodigo
-							HAVING COUNT(DISTINCT i.violCodigo) = (SELECT COUNT(DISTINCT i.violCodigo)
-																	FROM Inspecciones i))
+GROUP BY e.estNumero , e.estNombre 
+HAVING COUNT(DISTINCT tv.violCodigo) = (SELECT COUNT(DISTINCT i.violCodigo)
+								        FROM Inspecciones i ) 
 
-SELECT e.estNombre , tv.violCodigo
-FROM Establecimientos e
-INNER JOIN Inspecciones i on i.estNumero = e.estNumero
-INNER JOIN TipoViolacion tv on i.violCodigo = tv.violCodigo 
 
 --d. Mostrar el porcentaje de inspecciones reprobadas por cada establecimiento, incluir dentro de 
 --la reprobación las categorías 'Falla', 'Pasa con condiciones'.
 
 --// Porcentaje inspecinesFallidas * 100 % establecimientosTotales //
 
-SELECT e.estNombre , COUNT(i.estNumero) AS cantidadEstablecimientosConFallaOCondiciones,COUNT(i.estNumero) * 100.0 / (SELECT COUNT(estNumero) FROM Establecimientos) AS porcentaje 
+SELECT e.estNombre , COUNT(i.estNumero) * 100.0 / (SELECT COUNT(estNumero) FROM Establecimientos) AS porcentaje 
 FROM Establecimientos e
 INNER JOIN Inspecciones i ON i.estNumero = e.estNumero
 WHERE i.inspResultado = 'Falla' OR i.inspResultado = 'Pasa con condiciones'
 GROUP BY e.estNombre;
-
-
-
 
 
 --e. Mostrar el ranking de inspecciones de establecimientos, dicho ranking debe mostrar número 
@@ -185,9 +192,24 @@ GROUP BY e.estNombre;
 --('Falla', 'Pasa con condiciones') y porcentaje de dichas inspecciones reprobadas, solo 
 --tener en cuenta establecimientos cuyo status de licencia es APR.
 
+SELECT 
+FROM Establecimientos e
+INNER JOIN Licencias l on l.estNumero = e.estNumero 
+WHERE l.licStatus = 'REV'
 
+
+SELECT *
+FROM Establecimientos e
+INNER JOIN Licencias l on l.estNumero = e.estNumero
+WHERE l.licStatus = 'APR'
 
 --f. Mostrar la diferencia de días en que cada establecimiento renovó su licencia.
+
+SELECT e.estNombre , DATEDIFF(day , l.licFchEmision , l.licFchVto) as difDias
+FROM Establecimientos e
+INNER JOIN Licencias l on l.estNumero = e.estNumero
+
+
 
 --4. Utilizando T-SQL realizar los siguientes ejercicios: 
 
